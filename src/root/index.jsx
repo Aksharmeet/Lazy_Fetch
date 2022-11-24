@@ -11,7 +11,7 @@ function App() {
 	const [visible, setVisible] = useState(false)
 
 	const FetchUserData = async () => {
-		userRef.current = userRef.current + 1 //incrementing userRef
+		userRef.current = userRef.current + 1
 
 		let last_user = userRef.current * 10
 		let crr_user = last_user - 9
@@ -42,8 +42,8 @@ function App() {
 	}, [userData, visible])
 
 	return (
-		<div className='App'>
-			<h1>Request Users</h1>
+		<div className={styles.wrapper}>
+			<h1 className={styles.hOne}>Request Users</h1>
 
 			<InfiniteScroll
 				dataLength={userData.length} //required field
@@ -56,8 +56,8 @@ function App() {
 						? userData.map((user) => (
 								<div key={user.id} className={styles.Usercont}>
 									<div className={styles.svgCont}>{parse(user.img)}</div>
-									<div>
-										<p>{user.id}</p>
+									<div className={styles.textCont}>
+										<p className={styles.userDotId}>{user.id}</p>
 										<p>{user.title}</p>
 										<p>{user.body}</p>
 										<p>{user.userId}</p>
