@@ -26,7 +26,8 @@ function App() {
 				const dicebar_avatar_url = `https://avatars.dicebear.com/api/${gender}/${data.title}.svg`
 
 				const { data: img } = await axios.get(dicebar_avatar_url)
-				setUserData((prev) => [...prev, { ...data, img }])
+				console.log(img)
+				setUserData((prev) => [...prev, { ...data, img: img.replace(/`viewBox="0 0 20 20"`/g, `viewBox="0 0 150 150"`) }])
 			} catch (err) {
 				console.log(err)
 			}
@@ -43,7 +44,6 @@ function App() {
 	return (
 		<div className='App'>
 			<h1>Request Users</h1>
-			<div className={styles.users_cont}></div>
 
 			<InfiniteScroll
 				dataLength={userData.length} //required field
@@ -51,19 +51,21 @@ function App() {
 				hasMore={userRef.current < 10 ? true : false} //using userRef for checking the actual current fetch user data request
 				endMessage={<p style={{ textAlign: 'center' }}>{userData.length === 100 ? <b>Yay! You have seen it all</b> : <b>More data loading</b>}</p>}
 			>
-				{userData.length > 0
-					? userData.map((user) => (
-							<div key={user.id}>
-								<div>{parse(user.img)}</div>
-								<div>
-									<p>{user.id}</p>
-									<p>{user.title}</p>
-									<p>{user.body}</p>
-									<p>{user.userId}</p>
+				<div className={styles.usersCont}>
+					{userData.length > 0
+						? userData.map((user) => (
+								<div key={user.id} className={styles.Usercont}>
+									<div className={styles.svgCont}>{parse(user.img)}</div>
+									<div>
+										<p>{user.id}</p>
+										<p>{user.title}</p>
+										<p>{user.body}</p>
+										<p>{user.userId}</p>
+									</div>
 								</div>
-							</div>
-					  ))
-					: ''}
+						  ))
+						: ''}
+				</div>
 			</InfiniteScroll>
 		</div>
 	)

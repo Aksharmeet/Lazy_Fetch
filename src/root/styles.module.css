@@ -1,0 +1,17 @@
+.usersCont{
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+}
+.Usercont{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    height:300px;
+}
+.svgCont{
+    height: 200px;
+    min-width:200px;
+}
+
