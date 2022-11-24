@@ -49,7 +49,11 @@ function App() {
 				dataLength={userData.length} //required field
 				next={userData.length === userRef.current * 10 && FetchUserData} //to ensure that data has been rendered before making a fetch request
 				hasMore={userRef.current < 10 ? true : false} //using userRef for checking the actual current fetch user data request
-				endMessage={<p style={{ textAlign: 'center' }}>{userData.length === 100 ? <b>Yay! You have seen it all</b> : <b>More data loading</b>}</p>}
+				endMessage={
+					<p style={{ textAlign: 'center', marginBottom: '200px' }}>
+						{userData.length === 100 ? <b>Yay! You have seen it all</b> : <b>More data loading</b>}
+					</p>
+				}
 			>
 				<div className={styles.usersCont}>
 					{userData.length > 0
