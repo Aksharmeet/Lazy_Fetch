@@ -2,7 +2,8 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 
 // components
-import App from './root'
+// import App from './root'
+import App from './observer_api'
 
 // styles
 import './index.css'
