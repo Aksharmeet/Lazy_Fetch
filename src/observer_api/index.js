@@ -1,110 +1,50 @@
 import React from 'react'
 
 const allData = new Array(25).fill(0).map((_val, i) => i + 1)
-const perPage = 5
+
+const per_page = 5
+
 const types = {
 	start: 'START',
 	loaded: 'LOADED',
 }
 
-const reducer = (state, action) => {
+const Reducer = (state, action) => {
 	switch (action.type) {
-		case types.start:
-			return { ...state, loading: true }
-		case types.loaded:
+		case 'START':
+			return { ...state, loader: true }
+		case 'LOADED':
 			return {
 				...state,
-				loading: false,
-				data: [...state.data, ...action.newData],
-				more: action.newData.length === perPage,
-				after: state.after + action.newData.length,
+				loader: false,
+				has_more: action.newData.length === per_page, // to check if more data exists
+				data: [...state.data, ...action.newData], // adding to the data
+				after: state.after + state.newData.length, // to keep track of current length
 			}
 		default:
-			throw new Error("Don't understand action")
+			throw new Error(`Don't understate the action type`)
 	}
 }
 
-const MyContext = React.createContext()
+const Context = React.createContext()
 
-function MyProvider({ children }) {
-	const [state, dispatch] = React.useReducer(reducer, {
-		loading: false,
-		more: true,
+const ContextProvider = ({ children }) => {
+	const [state, dispatch] = React.useReducer(Reducer, {
+		loader: false,
+		has_more: true,
 		data: [],
 		after: 0,
 	})
-	const { loading, data, after, more } = state
+	const { loader, has_more, data, after } = state
 
 	const load = () => {
 		dispatch({ type: types.start })
 
 		setTimeout(() => {
-			const newData = allData.slice(after, after + perPage)
+			const newData = allData.slice(after, per_page + after)
 			dispatch({ type: types.loaded, newData })
 		}, 300)
 	}
 
-	return <MyContext.Provider value={{ loading, data, more, load }}>{children}</MyContext.Provider>
+	return <Context.Provider value={{ loader, has_more, data, after, load }}>{children}</Context.Provider>
 }
-
-function Main() {
-	const { data, loading, more, load } = React.useContext(MyContext)
-	const loader = React.useRef(load)
-	const observer = React.useRef(
-		new IntersectionObserver(
-			(entries) => {
-				const first = entries[0]
-				if (first.isIntersecting) {
-					loader.current()
-				}
-			},
-			{ threshold: 1 }
-		)
-	)
-	const [element, setElement] = React.useState(null)
-
-	React.useEffect(() => {
-		loader.current = load
-	}, [load])
-
-	React.useEffect(() => {
-		const currentElement = element
-		const currentObserver = observer.current
-
-		if (currentElement) {
-			currentObserver.observe(currentElement)
-		}
-
-		return () => {
-			if (currentElement) {
-				currentObserver.unobserve(currentElement)
-			}
-		}
-	}, [element])
-
-	return (
-		<div className='App'>
-			<ul>
-				{data.map((row) => (
-					<li key={row} style={{ background: 'orange' }}>
-						{row}
-					</li>
-				))}
-
-				{loading && <li>Loading...</li>}
-
-				{!loading && more && <li ref={setElement} style={{ background: 'transparent' }}></li>}
-			</ul>
-		</div>
-	)
-}
-
-const App = () => {
-	return (
-		<MyProvider>
-			<Main />
-		</MyProvider>
-	)
-}
-
-export default App
