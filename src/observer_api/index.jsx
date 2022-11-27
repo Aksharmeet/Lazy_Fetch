@@ -1,8 +1,8 @@
-import { useEffect, useReducer, useRef, useState, createContext, useContext } from 'react'
-
+import axios from 'axios'
+import { useEffect, useReducer, useRef, useState, useCallback } from 'react'
+import parse from 'html-react-parser'
 import styles from './styles.module.css'
 const per_page = 5
-const allData = new Array(25).fill(0).map((num, i) => i + 1)
 
 const types = {
 	start: 'START',
@@ -16,39 +16,52 @@ const reducer = (state, action) => {
 			return {
 				...state,
 				loading: false,
-				has_more: action.newData.length === per_page,
-				data: [...state.data, ...action.newData],
-				after: state.after + action.newData.length,
+				has_more: action.temp_arr.length === per_page,
+				data: [...state.data, ...action.temp_arr],
+				after: state.after + action.temp_arr.length,
 			}
 		default:
 			throw new Error("Don't understand action")
 	}
 }
-const Context = createContext()
-
-const ContextProvider = ({ children }) => {
+// const Context = createContext()
+const Main = () => {
+	// const ContextProvider = ({ children }) => {
 	const [state, dispatch] = useReducer(reducer, {
 		loading: false,
 		has_more: true,
 		data: [],
-		after: 0,
+		after: 1,
 	})
 	const { loading, has_more, data, after } = state
-	const fetch = () => {
+	const fetch = useCallback(() => {
 		dispatch({ type: types.start })
 
-		setTimeout(() => {
-			const newData = allData.slice(after, after + per_page)
-			console.log(data.length)
-			console.log(after)
-			dispatch({ type: types.loaded, newData })
-		}, 300)
-	}
-	return <Context.Provider value={{ fetch, loading, has_more, data }}>{children}</Context.Provider>
-}
+		const getData = async () => {
+			let last_user = after + per_page
+			let crr_user = after
+			let temp_arr = []
+			for (crr_user; crr_user < last_user; crr_user++) {
+				try {
+					const fetch_userData_url = `https://jsonplaceholder.typicode.com/posts/${crr_user}`
+					const { data } = await axios.get(fetch_userData_url)
 
-const Main = () => {
-	const { loading, has_more, data, fetch } = useContext(Context)
+					let gender = crr_user % 2 === 0 ? 'male' : 'female'
+					const dicebar_avatar_url = `https://avatars.dicebear.com/api/${gender}/${data.title}.svg`
+					const { data: avatar } = await axios.get(dicebar_avatar_url)
+					temp_arr.push({ ...data, svg: avatar })
+				} catch (err) {
+					console.log(err)
+				}
+			}
+			dispatch({ type: types.loaded, temp_arr })
+		}
+		getData()
+	}, [after])
+	// 	return <Context.Provider value={{ fetch, loading, has_more, data }}>{children}</Context.Provider>
+	// }
+
+	// const { loading, has_more, data, fetch } = useContext(Context)
 
 	const fetcherRef = useRef(fetch)
 	const observer = useRef(
@@ -87,25 +100,34 @@ const Main = () => {
 
 	return (
 		<div>
-			<h1>Lazy Fetch using Intersection Observer</h1>
-			<div>
-				{data.map((el) => (
-					<div key={el} className={styles.elementCont}>
-						{el}
-					</div>
-				))}
+			<h1 className={styles.h_one}>Lazy Fetch using Intersection Observer</h1>
+			<div className={styles.usersCont}>
+				{data.length > 0
+					? data.map((user) => (
+							<div key={user.id} className={styles.Usercont}>
+								<div className={styles.svgCont}>{parse(user.svg)}</div>
+								<div className={styles.textCont}>
+									<p className={styles.userDotId}>{user.id}</p>
+									<p>{user.title}</p>
+									<p>{user.body}</p>
+									<p>{user.userId}</p>
+								</div>
+							</div>
+					  ))
+					: ''}
 			</div>
-			<div ref={setElement}>{loading && has_more && <p>loading...</p>}</div>
+			{has_more && (
+				<div>
+					<p className={styles.loading}>loading...</p>
+				</div>
+			)}
+			{!loading && has_more && <div ref={setElement}></div>}
 		</div>
 	)
 }
 
 const App = () => {
-	return (
-		<ContextProvider>
-			<Main />
-		</ContextProvider>
-	)
+	return <Main />
 }
 
 export default App

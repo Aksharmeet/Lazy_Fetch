@@ -15,25 +15,23 @@ function App() {
 
 		let last_user = userRef.current * 10
 		let crr_user = last_user - 9
-
+		let temp_arr = []
 		for (crr_user; crr_user <= last_user; crr_user++) {
-			const fetch_userData_url = `https://jsonplaceholder.typicode.com/posts/${crr_user}`
-
 			try {
+				const fetch_userData_url = `https://jsonplaceholder.typicode.com/posts/${crr_user}`
 				const { data } = await axios.get(fetch_userData_url)
 
 				let gender = crr_user % 2 === 0 ? 'male' : 'female'
 				const dicebar_avatar_url = `https://avatars.dicebear.com/api/${gender}/${data.title}.svg`
-
 				const { data: img } = await axios.get(dicebar_avatar_url)
-				console.log(img)
-				setUserData((prev) => [...prev, { ...data, img: img.replace(/`viewBox="0 0 20 20"`/g, `viewBox="0 0 150 150"`) }])
+				temp_arr.push({ ...data, img })
 			} catch (err) {
 				console.log(err)
 			}
 
 			setVisible(false)
 		}
+		setUserData((prev) => [...prev, temp_arr])
 	}
 	useEffect(() => {
 		if (userRef.current === 0) {
