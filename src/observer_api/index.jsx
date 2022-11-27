@@ -70,6 +70,10 @@ const Main = () => {
 				const first_entry = enteries[0]
 				if (first_entry.isIntersecting) {
 					fetcherRef.current()
+					//we have to the ref becuase if not this will create a closure around
+					// the stale state of fetch which was obtained during the initialization of the observer
+					// to avoid stale fetch function we keep it outside the closure of observe ref and update it using
+					//  useffect and get it's value using useRef.
 				}
 			},
 			{ threshold: 1 }
