@@ -1,26 +1,14 @@
-import { useRef } from 'react'
-import { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
+import useObserverHook from './useObserverHook'
 
-const useIntersect = ({ root = null, rootMargin, threshold }) => {
-	const [entry, updateEntry] = useState({})
-	const [node, setNode] = useState(null)
+function Index() {
+	const [isIntersecting, setElement] = useObserverHook({ root: null, threshold: 0.5 })
 
-	const observer = useRef(null)
 	useEffect(() => {
-		observer.current = new IntersectionObserver(([entry]) => updateEntry(entry), {
-			root,
-			rootMargin,
-			threshold,
-		})
+		console.log(isIntersecting)
+	}, [isIntersecting])
 
-		const { current: currentObserver } = observer
-
-		if (node) currentObserver.observe(node)
-
-		return () => currentObserver.disconnect()
-	}, [node, root, rootMargin, threshold])
-
-	return [entry, setNode]
+	return <div ref={setElement}>observer_hook</div>
 }
 
-export default useIntersect
+export default Index
