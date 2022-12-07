@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react'
-import useObserverHook from './useObserverHook'
+import useIntersectionObserver from './useIntersectionObserver'
 
 function Index() {
-	const [isIntersecting, setElement] = useObserverHook({ root: null, threshold: 0.5 })
+	const [isIntersecting, setElement] = useIntersectionObserver({ root: null, threshold: 0.5 })
 
 	useEffect(() => {
 		console.log(isIntersecting)
