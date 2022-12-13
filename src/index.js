@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom/client'
 
 // components
 // import App from './root'
-// import Main from './observer_api'
-import Main from './observer_api_hook'
+import Main from './observer_api'
+
 // styles
 import './index.css'
 
